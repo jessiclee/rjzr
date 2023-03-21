@@ -17,8 +17,8 @@ public class GameView extends SurfaceView implements Runnable {
         super(activity);
         this.screenX = screenX;
         this.screenY = screenY;
-        screenRatioX = 1920f / screenX;
-        screenRatioY = 1080f / screenY;
+        screenRatioX = 2560f / screenX;
+        screenRatioY = 1440f / screenY;
 
         background1 = new Background(screenX, screenY, getResources());
         background2 = new Background(screenX, screenY, getResources());
@@ -51,15 +51,15 @@ public class GameView extends SurfaceView implements Runnable {
     }
 
     private void toUpdate() {
-        background1.y -= (40 * screenRatioY);
-        if (background1.y + this.screenY < 0){
-            background1.y = screenY;
+        background1.y += (40 * screenRatioY);
+        if (background1.y > this.screenY){
+            background1.y = 0;
         }
-        if (background1.y < 0) {
-            background2.y = background1.y + this.screenY;
+        if (background1.y > 0) {
+            background2.y = background1.y - this.screenY;
         }
         else {
-            background2.y = background1.y - this.screenY;
+            background2.y = background1.y + this.screenY;
         }
     }
 
