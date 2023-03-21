@@ -13,6 +13,8 @@ public class GameView extends SurfaceView implements Runnable {
     private int screenX, screenY = 0;
     public static float screenRatioX, screenRatioY;
 
+    private RunningMan runningMan;
+
     public GameView(MainGameView activity, int screenX, int screenY){
         super(activity);
         this.screenX = screenX;
@@ -23,6 +25,7 @@ public class GameView extends SurfaceView implements Runnable {
         background1 = new Background(screenX, screenY, getResources());
         background2 = new Background(screenX, screenY, getResources());
 
+        runningMan = new RunningMan(this, screenX, screenY, getResources());
 
     }
 
@@ -30,7 +33,11 @@ public class GameView extends SurfaceView implements Runnable {
     public void run(){
         while(isRunning){
             toUpdate();
-            toDraw();
+            try {
+                toDraw();
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
             toSleep();
         }
     }
@@ -43,12 +50,17 @@ public class GameView extends SurfaceView implements Runnable {
         }
     }
 
-    private void toDraw() {
-        if (getHolder().getSurface().isValid()) {
-            Canvas canvas = getHolder().lockCanvas();
-            canvas.drawBitmap(background1.background, background1.x, background1.y, paint);
-            canvas.drawBitmap(background2.background, background2.x, background2.y, paint);
-            getHolder().unlockCanvasAndPost(canvas);
+    private void toDraw() throws InterruptedException {
+        try {
+            if (getHolder().getSurface().isValid()) {
+                Canvas canvas = getHolder().lockCanvas();
+                canvas.drawBitmap(background1.background, background1.x, background1.y, paint);
+                canvas.drawBitmap(background2.background, background2.x, background2.y, paint);
+                canvas.drawBitmap(runningMan.getRun(), runningMan.x, runningMan.y, paint);
+                getHolder().unlockCanvasAndPost(canvas);
+            }
+        } catch(InterruptedException e){
+            e.printStackTrace();
         }
     }
 
