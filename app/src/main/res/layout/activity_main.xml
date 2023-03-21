@@ -9,7 +9,7 @@
     <ImageView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:src="@drawable/ic_launcher_background"
+        android:src="@drawable/background"
         tools:layout_editor_absoluteX="206dp"
         tools:layout_editor_absoluteY="16dp" />
     <TextView
