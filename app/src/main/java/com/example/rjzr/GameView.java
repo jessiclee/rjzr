@@ -5,13 +5,21 @@ import android.graphics.Paint;
 import android.view.SurfaceView;
 import android.content.Context;
 
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+
 public class GameView extends SurfaceView implements Runnable {
     private Thread thread;
     private boolean isRunning;
     private Paint paint;
     private Background background1, background2;
-    private int screenX, screenY = 0;
-    public static float screenRatioX, screenRatioY;
+
+    static Lock slock = new ReentrantLock();
+    static Lock srlock = new ReentrantLock();
+
+    private Cone cone;
+    static volatile int screenX, screenY = 0;
+    public static volatile float screenRatioX, screenRatioY;
 
     private RunningMan runningMan;
 
@@ -24,15 +32,19 @@ public class GameView extends SurfaceView implements Runnable {
 
         background1 = new Background(screenX, screenY, getResources());
         background2 = new Background(screenX, screenY, getResources());
-
+        cone = new Cone(this, screenX, screenY, getResources());
         runningMan = new RunningMan(this, screenX, screenY, getResources());
+
 
     }
 
     @Override
     public void run(){
+        Thread t1 = new Thread(update);
+        Thread t2 = new Thread(lane2);
+        t2.start();
+        t1.start();
         while(isRunning){
-            toUpdate();
             try {
                 toDraw();
             } catch (InterruptedException e) {
@@ -41,6 +53,34 @@ public class GameView extends SurfaceView implements Runnable {
             toSleep();
         }
     }
+
+    // multithread for updating the background animation
+    Runnable update = new Runnable() {
+        @Override
+        public void run() {
+            while(isRunning) {
+                background1.y += (5 * screenRatioY);
+                if (background1.y > screenY) {
+                    background1.y = 0;
+                }
+                if (background1.y > 0) {
+                    background2.y = background1.y - screenY;
+                } else {
+                    background2.y = background1.y + screenY;
+                }
+            }
+        }
+    };
+
+    Runnable lane2 = new Runnable() {
+        @Override
+        public void run() {
+            while(isRunning) {
+
+            }
+        }
+    };
+
 
     private void toSleep() {
         try{
@@ -57,6 +97,8 @@ public class GameView extends SurfaceView implements Runnable {
                 canvas.drawBitmap(background1.background, background1.x, background1.y, paint);
                 canvas.drawBitmap(background2.background, background2.x, background2.y, paint);
                 canvas.drawBitmap(runningMan.getRun(), runningMan.x, runningMan.y, paint);
+
+                canvas.drawBitmap(cone.getMyCone(), cone.x, cone.y, paint);
                 getHolder().unlockCanvasAndPost(canvas);
             }
         } catch(InterruptedException e){
@@ -64,18 +106,18 @@ public class GameView extends SurfaceView implements Runnable {
         }
     }
 
-    private void toUpdate() {
-        background1.y += (40 * screenRatioY);
-        if (background1.y > this.screenY){
-            background1.y = 0;
-        }
-        if (background1.y > 0) {
-            background2.y = background1.y - this.screenY;
-        }
-        else {
-            background2.y = background1.y + this.screenY;
-        }
-    }
+//    private void toUpdate() {
+//        background1.y += (40 * screenRatioY);
+//        if (background1.y > this.screenY){
+//            background1.y = 0;
+//        }
+//        if (background1.y > 0) {
+//            background2.y = background1.y - this.screenY;
+//        }
+//        else {
+//            background2.y = background1.y + this.screenY;
+//        }
+//    }
 
     public void resume(){
         isRunning = true;
