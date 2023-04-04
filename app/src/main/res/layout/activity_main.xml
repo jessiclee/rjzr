@@ -14,6 +14,16 @@
         tools:layout_editor_absoluteX="206dp"
         tools:layout_editor_absoluteY="16dp" />
 
+    <TextView
+        android:id="@+id/main_highscore"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="test"
+        android:layout_centerInParent="true"
+        android:textSize="25sp"
+        android:textColor="#000"
+            />
+
     <Button
         android:id="@+id/play"
         android:layout_width="wrap_content"
