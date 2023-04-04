@@ -30,13 +30,16 @@ public class MainGameView extends AppCompatActivity {
                     Toast.makeText(ctx, "top", Toast.LENGTH_SHORT).show();
                 }
                 public void onSwipeRight() {
-                    Toast.makeText(ctx, "right", Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(ctx, "right", Toast.LENGTH_SHORT).show();
+                    gameView.runningMan.x += 400;
                 }
                 public void onSwipeLeft() {
-                    Toast.makeText(ctx, "left", Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(ctx, "left", Toast.LENGTH_SHORT).show();
+                    gameView.runningMan.x -= 400;
                 }
                 public void onSwipeBottom() {
-                Toast.makeText(ctx, "bottom", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ctx, "bottom", Toast.LENGTH_SHORT).show();
+
             }
 
         });

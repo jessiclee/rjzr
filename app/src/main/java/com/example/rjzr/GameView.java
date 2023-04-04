@@ -22,7 +22,7 @@ public class GameView extends SurfaceView implements Runnable {
     static volatile int screenX, screenY = 0;
     public static volatile float screenRatioX, screenRatioY;
 
-    private RunningMan runningMan;
+    RunningMan runningMan;
 
     public GameView(MainGameView activity, int screenX, int screenY){
         super(activity);
@@ -119,8 +119,6 @@ public class GameView extends SurfaceView implements Runnable {
 //            background2.y = background1.y + this.screenY;
 //        }
 //    }
-
-
 
     public void resume(){
         isRunning = true;
