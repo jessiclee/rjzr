@@ -5,7 +5,6 @@ import android.graphics.Paint;
 import android.view.MotionEvent;
 import android.view.SurfaceView;
 import android.content.Context;
-import android.widget.TextView;
 
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -18,12 +17,12 @@ public class GameView extends SurfaceView implements Runnable {
 
     static Lock slock = new ReentrantLock();
     static Lock srlock = new ReentrantLock();
-    int score;
-    private Cone cone;
+
+    private Cone cones[] = new Cone[6];
     static volatile int screenX, screenY = 0;
     public static volatile float screenRatioX, screenRatioY;
-
     RunningMan runningMan;
+
 
     public GameView(MainGameView activity, int screenX, int screenY){
         super(activity);
@@ -34,19 +33,22 @@ public class GameView extends SurfaceView implements Runnable {
 
         background1 = new Background(screenX, screenY, getResources());
         background2 = new Background(screenX, screenY, getResources());
-        cone = new Cone(this, screenX, screenY, getResources());
         runningMan = new RunningMan(this, screenX, screenY, getResources());
-        TextView currTimer = findViewById(R.id.timer_text);
 
+        int[] conePosY = {0, -650, -1150, -1700, -2350, -1150};
+        int[] conePosX = {screenX, screenX-800, screenX+800 , screenX, screenX-800, screenX+800};
 
+        for(int i = 0; i < 6; i++){
+            cones[i] = new Cone(this, conePosX[i], conePosY[i], getResources());
+
+        }
     }
 
     @Override
     public void run(){
         Thread t1 = new Thread(update);
-        Thread t2 = new Thread(lane2);
-        t2.start();
         t1.start();
+
         while(isRunning){
             try {
                 toDraw();
@@ -62,7 +64,12 @@ public class GameView extends SurfaceView implements Runnable {
         @Override
         public void run() {
             while(isRunning) {
-                background1.y += (40 * screenRatioY);
+                try {
+                    Thread.sleep(70);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+                background1.y += (30 * screenRatioY);
                 if (background1.y >screenY) {
                     background1.y = 0;
                 }
@@ -71,18 +78,19 @@ public class GameView extends SurfaceView implements Runnable {
                 } else {
                     background2.y = background1.y + screenY;
                 }
+
+                for(Cone c: cones){
+                    if(c.y > screenY){
+                        c.y = 0;
+                    } else{
+                        c.y += 20;
+                    }
+                }
+
             }
         }
     };
 
-    Runnable lane2 = new Runnable() {
-        @Override
-        public void run() {
-            while(isRunning) {
-
-            }
-        }
-    };
 
 
     private void toSleep() {
@@ -92,6 +100,7 @@ public class GameView extends SurfaceView implements Runnable {
             e.printStackTrace();
         }
     }
+
     private void toDraw() throws InterruptedException {
         try {
             if (getHolder().getSurface().isValid()) {
@@ -99,8 +108,11 @@ public class GameView extends SurfaceView implements Runnable {
                 canvas.drawBitmap(background1.background, background1.x, background1.y, paint);
                 canvas.drawBitmap(background2.background, background2.x, background2.y, paint);
                 canvas.drawBitmap(runningMan.getRun(), runningMan.x, runningMan.y, paint);
-                //canvas.drawText(score + "", screenX / 2f, 164);
-                canvas.drawBitmap(cone.getMyCone(), cone.x, cone.y, paint);
+
+                for(Cone c: cones){
+                    canvas.drawBitmap(c.getMyCone(), c.x, c.y, paint);
+                }
+
                 getHolder().unlockCanvasAndPost(canvas);
             }
         } catch(InterruptedException e){
@@ -108,18 +120,7 @@ public class GameView extends SurfaceView implements Runnable {
         }
     }
 
-//    private void toUpdate() {
-//        background1.y += (40 * screenRatioY);
-//        if (background1.y > this.screenY){
-//            background1.y = 0;
-//        }
-//        if (background1.y > 0) {
-//            background2.y = background1.y - this.screenY;
-//        }
-//        else {
-//            background2.y = background1.y + this.screenY;
-//        }
-//    }
+
 
     public void resume(){
         isRunning = true;
