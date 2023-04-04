@@ -60,8 +60,8 @@ public class GameView extends SurfaceView implements Runnable {
         @Override
         public void run() {
             while(isRunning) {
-                background1.y += (5 * screenRatioY);
-                if (background1.y > screenY) {
+                background1.y += (40 * screenRatioY);
+                if (background1.y >screenY) {
                     background1.y = 0;
                 }
                 if (background1.y > 0) {

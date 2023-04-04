@@ -37,7 +37,7 @@ public class RunningMan {
     }
 
     Bitmap getRun() throws InterruptedException {
-        Thread.sleep(80);
+        Thread.sleep(20);
         if(runCounter == 1){
             runCounter++;
             return running1;
