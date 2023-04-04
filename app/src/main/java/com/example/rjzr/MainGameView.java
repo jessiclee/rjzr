@@ -7,6 +7,7 @@ import android.content.Context;
 import android.graphics.Point;
 import android.os.Bundle;
 import android.view.View;
+import android.util.Log;
 import android.widget.Toast;
 
 public class MainGameView extends AppCompatActivity {
