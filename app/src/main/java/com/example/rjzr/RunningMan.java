@@ -36,8 +36,8 @@ public class RunningMan {
         y = (int) (screenY - height);
     }
 
-    Bitmap getRun() throws InterruptedException {
-        Thread.sleep(20);
+    Bitmap getRun() throws InterruptedException{
+        Thread.sleep(40);
         if(runCounter == 1){
             runCounter++;
             return running1;

@@ -34,7 +34,8 @@ public class Cone {
         y = (int) (screenY - height);
     }
 
-    Bitmap getMyCone(){
+    Bitmap getMyCone() throws InterruptedException{
+
         return myCone;
     };
 
