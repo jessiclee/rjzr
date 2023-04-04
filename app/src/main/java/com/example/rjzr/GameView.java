@@ -2,6 +2,7 @@ package com.example.rjzr;
 
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.view.MotionEvent;
 import android.view.SurfaceView;
 import android.content.Context;
 
@@ -118,6 +119,8 @@ public class GameView extends SurfaceView implements Runnable {
 //            background2.y = background1.y + this.screenY;
 //        }
 //    }
+
+
 
     public void resume(){
         isRunning = true;

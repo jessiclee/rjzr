@@ -2,15 +2,15 @@ package com.example.rjzr;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Context;
 import android.graphics.Point;
 import android.os.Bundle;
 import android.view.View;
 import android.util.Log;
+import android.widget.Toast;
 
 public class MainGameView extends AppCompatActivity {
-    final String TAG = "Main GameView";
     private GameView gameView;
-    MainActivity.OnSwipeTouchListener onSwipeTouchListener;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -23,13 +23,23 @@ public class MainGameView extends AppCompatActivity {
         Point point = new Point();
         getWindowManager().getDefaultDisplay().getSize(point);
         gameView = new GameView(this, point.x, point.y);
-
+        Context ctx = getApplicationContext();
         setContentView(gameView);
-        try {
-            onSwipeTouchListener = new MainActivity.OnSwipeTouchListener(this, findViewById(R.id.main_game_view_relativeLayout));
-        }catch(Exception e){
-            Log.d(TAG, e.getMessage());
-        }
+        gameView.setOnTouchListener(new OnSwipeTouchListener(ctx) {
+                public void onSwipeTop() {
+                    Toast.makeText(ctx, "top", Toast.LENGTH_SHORT).show();
+                }
+                public void onSwipeRight() {
+                    Toast.makeText(ctx, "right", Toast.LENGTH_SHORT).show();
+                }
+                public void onSwipeLeft() {
+                    Toast.makeText(ctx, "left", Toast.LENGTH_SHORT).show();
+                }
+                public void onSwipeBottom() {
+                Toast.makeText(ctx, "bottom", Toast.LENGTH_SHORT).show();
+            }
+
+        });
     }
 
     @Override
