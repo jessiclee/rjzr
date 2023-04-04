@@ -3,6 +3,7 @@ package com.example.rjzr;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.view.View;
@@ -16,6 +17,8 @@ public class MainActivity extends AppCompatActivity {
 
     MediaPlayer mediaPlayer;
 
+    DatabaseHelper mdb;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -27,6 +30,10 @@ public class MainActivity extends AppCompatActivity {
                 | View.SYSTEM_UI_FLAG_FULLSCREEN
                 | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
         decorView.setSystemUiVisibility(uiOptions);
+
+        mdb = new DatabaseHelper(this);
+        SQLiteDatabase sqLiteDatabase = mdb.getWritableDatabase();
+
         findViewById(R.id.play).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

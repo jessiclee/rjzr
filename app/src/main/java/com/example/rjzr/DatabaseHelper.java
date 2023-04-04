@@ -1,5 +1,6 @@
 package com.example.rjzr;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
@@ -27,10 +28,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
-
     @Override
     public void onCreate(SQLiteDatabase db){
         db.execSQL(CREATE_TABLE);
+        ContentValues values = new ContentValues();
+
+        values.put(SCORE, 0);
+        db.insert(SCORE_TABLE, null, values);
+
     }
 
     @Override
