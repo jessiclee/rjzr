@@ -6,6 +6,7 @@ import static com.example.rjzr.GameView.screenRatioY;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Rect;
 
 public class Cone {
     Bitmap myCone;
@@ -38,5 +39,9 @@ public class Cone {
 
         return myCone;
     };
+
+    Rect getCollisionShape () {
+        return new Rect(x - 100, y + 200, x + width - 100, y + height - 100);
+    }
 
 }

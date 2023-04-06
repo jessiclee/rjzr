@@ -6,6 +6,7 @@ import static com.example.rjzr.GameView.screenRatioY;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Rect;
 
 
 public class RunningMan {
@@ -49,5 +50,8 @@ public class RunningMan {
         return running2;
     }
 
+    Rect getCollisionShape () {
+        return new Rect(x - 100, y - 100, x + width - 100, y + height - 100);
+    }
 
 }

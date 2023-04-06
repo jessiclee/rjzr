@@ -1,10 +1,16 @@
 package com.example.rjzr;
 
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Rect;
 import android.view.MotionEvent;
 import android.view.SurfaceView;
 import android.content.Context;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -23,6 +29,11 @@ public class GameView extends SurfaceView implements Runnable {
     public static volatile float screenRatioX, screenRatioY;
     RunningMan runningMan;
 
+    private int numLives;
+    private boolean isInv;
+    private int inv_timer;
+
+    private final Object mutex = new Object();
 
     public GameView(MainGameView activity, int screenX, int screenY){
         super(activity);
@@ -30,24 +41,26 @@ public class GameView extends SurfaceView implements Runnable {
         this.screenY = screenY;
         screenRatioX = 2560f / screenX;
         screenRatioY = 1440f / screenY;
-
+        numLives = 3;
         background1 = new Background(screenX, screenY, getResources());
         background2 = new Background(screenX, screenY, getResources());
         runningMan = new RunningMan(this, screenX, screenY, getResources());
 
-        int[] conePosY = {0, -650, -1150, -1700, -2350, -1150};
+        int[] conePosY = {0, -750, -1300, -2100, -2600, -1300};
         int[] conePosX = {screenX, screenX-800, screenX+800 , screenX, screenX-800, screenX+800};
 
         for(int i = 0; i < 6; i++){
             cones[i] = new Cone(this, conePosX[i], conePosY[i], getResources());
-
         }
     }
 
     @Override
     public void run(){
+
         Thread t1 = new Thread(update);
+        Thread t2 = new Thread(checkCollision);
         t1.start();
+        t2.start();
 
         while(isRunning){
             try {
@@ -85,8 +98,63 @@ public class GameView extends SurfaceView implements Runnable {
                     } else{
                         c.y += 20;
                     }
+
+
                 }
 
+            }
+        }
+    };
+
+    Runnable checkCollision = new Runnable() {
+        @Override
+        public void run() {
+            int x = 0;
+            while (isRunning) {
+                for (Cone c : cones) {
+                    if (Rect.intersects(c.getCollisionShape(), runningMan.getCollisionShape())) {
+                        synchronized (mutex) {
+                            x = numLives;
+                        }
+                            System.out.println("I hit something");
+                            if (x > 1) {
+                                System.out.println("initiate counter thread");
+                                Thread counter = new Thread(invincible_Counter);
+                                counter.start();
+                                try {
+                                    counter.join();
+                                } catch (InterruptedException e) {
+                                    throw new RuntimeException(e);
+                                }
+                            } else {
+                                isRunning = false;
+                                return;
+                            }
+
+                    }
+                }
+            }
+        }
+    };
+
+    Runnable invincible_Counter = new Runnable() {
+        @Override
+        public void run() {
+            try {
+                isInv = true;
+                synchronized (mutex){
+                    numLives--;
+                    System.out.println("Number of Lives: " +numLives);
+                    for(int i = 0; i < 5; i ++){
+                        inv_timer ++;
+                        Thread.sleep(1000);
+                    }
+                    inv_timer = 0;
+                    isInv = false;
+                    return;
+                }
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
             }
         }
     };
@@ -108,6 +176,12 @@ public class GameView extends SurfaceView implements Runnable {
                 canvas.drawBitmap(background1.background, background1.x, background1.y, paint);
                 canvas.drawBitmap(background2.background, background2.x, background2.y, paint);
                 canvas.drawBitmap(runningMan.getRun(), runningMan.x, runningMan.y, paint);
+
+//                canvas.drawText("Lives Left:" + numLives + "", screenX , 164, paint);
+//                if(isInv){
+//                    canvas.drawText("Invisibility:" + inv_timer + " s", screenX , 164, paint);
+//                }
+
 
                 for(Cone c: cones){
                     canvas.drawBitmap(c.getMyCone(), c.x, c.y, paint);
