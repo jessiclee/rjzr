@@ -59,8 +59,11 @@ public class GameView extends SurfaceView implements Runnable {
 
         Thread t1 = new Thread(update);
         Thread t2 = new Thread(checkCollision);
+        Thread t3 = new Thread(addLives);
+
         t1.start();
         t2.start();
+        t3.start();
 
         while(isRunning){
             try {
@@ -106,18 +109,30 @@ public class GameView extends SurfaceView implements Runnable {
         }
     };
 
+    Runnable addLives = new Runnable() {
+        @Override
+        public void run() {
+            while(isRunning){
+                try {
+                    Thread.sleep(30000);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+                synchronized (mutex){
+                    numLives++;
+                }
+            }
+        }
+    };
+
     Runnable checkCollision = new Runnable() {
         @Override
         public void run() {
-            int x = 0;
             while (isRunning) {
                 for (Cone c : cones) {
                     if (Rect.intersects(c.getCollisionShape(), runningMan.getCollisionShape())) {
-                        synchronized (mutex) {
-                            x = numLives;
-                        }
                             System.out.println("I hit something");
-                            if (x > 1) {
+                            if (numLives > 1) {
                                 System.out.println("initiate counter thread");
                                 Thread counter = new Thread(invincible_Counter);
                                 counter.start();
@@ -144,6 +159,7 @@ public class GameView extends SurfaceView implements Runnable {
                 isInv = true;
                 synchronized (mutex){
                     numLives--;
+                }
                     System.out.println("Number of Lives: " +numLives);
                     for(int i = 0; i < 5; i ++){
                         inv_timer ++;
@@ -152,7 +168,7 @@ public class GameView extends SurfaceView implements Runnable {
                     inv_timer = 0;
                     isInv = false;
                     return;
-                }
+
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
