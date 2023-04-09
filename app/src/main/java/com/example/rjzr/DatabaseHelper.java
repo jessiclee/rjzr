@@ -9,7 +9,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final int DATABASE_VERSION = 1;
     private static final String DATABASE_NAME = "db";
 
-    private static final String SCORE_TABLE = "score_entries";
+    public static final String SCORE_TABLE = "score_entries";
 
     //Column names
     public static final String ID = "_id";
@@ -43,8 +43,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + SCORE_TABLE);
         onCreate(db);
     }
-
-
 
 }
 

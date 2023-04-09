@@ -1,9 +1,15 @@
 package com.example.rjzr;
 
+import static com.example.rjzr.DatabaseHelper.*;
+
+import android.content.ContentValues;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.provider.Settings;
 import android.view.MotionEvent;
 import android.view.SurfaceView;
 import android.content.Context;
@@ -28,6 +34,18 @@ public class GameView extends SurfaceView implements Runnable {
     static volatile int screenX, screenY = 0;
     public static volatile float screenRatioX, screenRatioY;
     RunningMan runningMan;
+
+    int gameTime = 0;
+    ContentValues values = new ContentValues();
+
+    Context ctx = getContext();
+    DatabaseHelper mdb = new DatabaseHelper(ctx);
+    SQLiteDatabase sqLiteDatabase = mdb.getWritableDatabase();
+
+    String getHighScoreQuery = "SELECT * FROM score_entries WHERE _id=1";
+    Cursor cursor = sqLiteDatabase.rawQuery(getHighScoreQuery, null);
+
+    int dbScore = 0;
 
     private int numLives;
     private boolean isInv;
@@ -60,10 +78,12 @@ public class GameView extends SurfaceView implements Runnable {
         Thread t1 = new Thread(update);
         Thread t2 = new Thread(checkCollision);
         Thread t3 = new Thread(addLives);
+        Thread t4 = new Thread(timerThread);
 
         t1.start();
         t2.start();
         t3.start();
+        t4.start();
 
         while(isRunning){
             try {
@@ -74,6 +94,22 @@ public class GameView extends SurfaceView implements Runnable {
             toSleep();
         }
     }
+
+    Runnable timerThread = new Runnable() {
+        @Override
+        public void run() {
+
+            while(isRunning){
+                try {
+                    //System.out.println("Current score:" + gameTime);
+                    Thread.sleep(1000);
+                    gameTime += 1;
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }
+    };
 
     // multithread for updating the background animation
     Runnable update = new Runnable() {
@@ -101,8 +137,6 @@ public class GameView extends SurfaceView implements Runnable {
                     } else{
                         c.y += 20;
                     }
-
-
                 }
 
             }
@@ -119,7 +153,10 @@ public class GameView extends SurfaceView implements Runnable {
                     throw new RuntimeException(e);
                 }
                 synchronized (mutex){
-                    numLives++;
+                    if(numLives < 3){
+                        numLives++;
+                    }
+
                 }
             }
         }
@@ -143,6 +180,27 @@ public class GameView extends SurfaceView implements Runnable {
                                 }
                             } else {
                                 isRunning = false;
+
+                                if (cursor.moveToFirst()) {
+                                    do {
+                                        dbScore = Integer.parseInt(cursor.getString(1));
+                                    } while (cursor.moveToNext());
+                                }
+//                                System.out.println("gamescore " + gameTime);
+//                                System.out.println("dbscore " + dbScore);
+//                                System.out.println(dbScore < gameTime);
+
+                                if(dbScore < gameTime){
+                                    values.put(SCORE, gameTime);
+                                    int rows = sqLiteDatabase.update(SCORE_TABLE, values, ID + "=?",new String[] {"1"});
+                                    System.out.println("no of rows affected" + rows);
+                                }
+
+                                // if yall wanna reset ur score uncomment out this
+//                                values.put(SCORE, 0);
+//                                int rows = sqLiteDatabase.update(SCORE_TABLE, values, ID + "=?",new String[] {"1"});
+//                                System.out.println("no of rows affected" + rows);
+
                                 return;
                             }
 
