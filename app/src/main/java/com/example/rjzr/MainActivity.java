@@ -51,6 +51,8 @@ public class MainActivity extends AppCompatActivity {
         }
         mainHighscore.setText("Highscore: " + actualHS ); //set text for text view
 
+        cursor.close();
+
         findViewById(R.id.play).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

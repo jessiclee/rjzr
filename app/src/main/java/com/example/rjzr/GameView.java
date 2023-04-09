@@ -196,6 +196,8 @@ public class GameView extends SurfaceView implements Runnable {
                                     System.out.println("no of rows affected" + rows);
                                 }
 
+                                cursor.close();
+
                                 // if yall wanna reset ur score uncomment out this
 //                                values.put(SCORE, 0);
 //                                int rows = sqLiteDatabase.update(SCORE_TABLE, values, ID + "=?",new String[] {"1"});
