@@ -261,7 +261,7 @@ public class GameView extends SurfaceView implements Runnable {
 
                 canvas.drawText("Lives Left:" + numLives + "", screenX/2f , 164, paint);
                 if(isInv){
-                    canvas.drawText("Invisibility:" + (5-inv_timer) + " s", screenX/4f ,950, paint);
+                    canvas.drawText("Invincibility:" + (5-inv_timer) + " s", screenX/4f ,950, paint);
                 }
 
 
