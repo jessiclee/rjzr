@@ -64,6 +64,10 @@ public class GameView extends SurfaceView implements Runnable {
         background2 = new Background(screenX, screenY, getResources());
         runningMan = new RunningMan(this, screenX, screenY, getResources());
 
+        paint = new Paint();
+        paint.setTextSize(128);
+        paint.setColor(Color.WHITE);
+
         int[] conePosY = {0, -750, -1300, -2100, -2600, -1300};
         int[] conePosX = {screenX, screenX-800, screenX+800 , screenX, screenX-800, screenX+800};
 
@@ -255,10 +259,10 @@ public class GameView extends SurfaceView implements Runnable {
                 canvas.drawBitmap(background2.background, background2.x, background2.y, paint);
                 canvas.drawBitmap(runningMan.getRun(), runningMan.x, runningMan.y, paint);
 
-//                canvas.drawText("Lives Left:" + numLives + "", screenX , 164, paint);
-//                if(isInv){
-//                    canvas.drawText("Invisibility:" + inv_timer + " s", screenX , 164, paint);
-//                }
+                canvas.drawText("Lives Left:" + numLives + "", screenX/2f , 164, paint);
+                if(isInv){
+                    canvas.drawText("Invisibility:" + (5-inv_timer) + " s", screenX/4f ,950, paint);
+                }
 
 
                 for(Cone c: cones){
