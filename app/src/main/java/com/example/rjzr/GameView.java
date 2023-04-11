@@ -263,7 +263,7 @@ public class GameView extends SurfaceView implements Runnable {
                 if(isInv){
                     canvas.drawText("Invincibility:" + (5-inv_timer) + " s", screenX/4f ,950, paint);
                 }
-
+                canvas.drawText("Score: " + gameTime + "", screenX/2f , 330, paint);
 
                 for(Cone c: cones){
                     canvas.drawBitmap(c.getMyCone(), c.x, c.y, paint);
