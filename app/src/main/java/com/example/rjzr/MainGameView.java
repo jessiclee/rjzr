@@ -2,7 +2,9 @@ package com.example.rjzr;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Point;
 import android.os.Bundle;
 import android.view.View;
@@ -30,6 +32,9 @@ public class MainGameView extends AppCompatActivity {
         Context ctx = getApplicationContext();
         setContentView(gameView);
         gameView.setOnTouchListener(new OnSwipeTouchListener(ctx) {
+            //                public void onSwipeTop() {
+//                    //Toast.makeText(ctx, "top", Toast.LENGTH_SHORT).show();
+//                }
             public void onSwipeRight() {
                 if(swipeLane < 3){
                     gameView.runningMan.x += 400;
@@ -43,6 +48,10 @@ public class MainGameView extends AppCompatActivity {
                     swipeLane--;
                 }
             }
+//                public void onSwipeBottom() {
+//                    //Toast.makeText(ctx, "bottom", Toast.LENGTH_SHORT).show();
+//
+//            }
 
         });
     }
