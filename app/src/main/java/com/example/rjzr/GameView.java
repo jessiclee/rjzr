@@ -9,16 +9,10 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
-import android.provider.Settings;
-import android.view.MotionEvent;
 import android.view.SurfaceView;
 import android.content.Context;
 import android.view.View;
-import android.widget.TextView;
 import android.content.Intent;
-
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 public class GameView extends SurfaceView implements Runnable {
     private Thread thread;
@@ -26,10 +20,6 @@ public class GameView extends SurfaceView implements Runnable {
     private boolean gameOver;
     private Paint paint;
     private Background background1, background2;
-
-    static Lock slock = new ReentrantLock();
-    static Lock srlock = new ReentrantLock();
-
     private Cone cones[] = new Cone[6];
     static volatile int screenX, screenY = 0;
     public static volatile float screenRatioX, screenRatioY;
@@ -38,21 +28,16 @@ public class GameView extends SurfaceView implements Runnable {
 
     int gameTime = 0;
     ContentValues values = new ContentValues();
-
     Context ctx = getContext();
     DatabaseHelper mdb = new DatabaseHelper(ctx);
     SQLiteDatabase sqLiteDatabase = mdb.getWritableDatabase();
-
     String getHighScoreQuery = "SELECT * FROM score_entries WHERE _id=1";
     Cursor cursor = sqLiteDatabase.rawQuery(getHighScoreQuery, null);
-
     int dbScore = 0;
-
     private int numLives;
     private boolean isInv;
     private int inv_timer;
     private MainGameView activity;
-
     private final Object mutex = new Object();
 
     public GameView(MainGameView activity, int screenX, int screenY){
@@ -63,6 +48,7 @@ public class GameView extends SurfaceView implements Runnable {
         screenRatioX = 2560f / screenX;
         screenRatioY = 1440f / screenY;
         numLives = 3;
+
         background1 = new Background(screenX, screenY, getResources());
         background2 = new Background(screenX, screenY, getResources());
         runningMan = new RunningMan(this, screenX, screenY, getResources());
@@ -82,7 +68,7 @@ public class GameView extends SurfaceView implements Runnable {
 
     @Override
     public void run(){
-
+        //Multithreading; start multiple threads for collision, timer, regeneration of lives and
         Thread t1 = new Thread(update);
         Thread t2 = new Thread(checkCollision);
         Thread t3 = new Thread(addLives);
@@ -103,13 +89,13 @@ public class GameView extends SurfaceView implements Runnable {
         }
     }
 
+    //Thread used for score through a timer
     Runnable timerThread = new Runnable() {
         @Override
         public void run() {
 
             while(isRunning){
                 try {
-                    //System.out.println("Current score:" + gameTime);
                     Thread.sleep(1000);
                     gameTime += 1;
                 } catch (Exception e) {
@@ -119,7 +105,7 @@ public class GameView extends SurfaceView implements Runnable {
         }
     };
 
-    // multithread for updating the background animation
+    // multi threading for updating the background animation and cones
     Runnable update = new Runnable() {
         @Override
         public void run() {
@@ -151,6 +137,7 @@ public class GameView extends SurfaceView implements Runnable {
         }
     };
 
+    //Regeneration of lives
     Runnable addLives = new Runnable() {
         @Override
         public void run() {
@@ -170,15 +157,14 @@ public class GameView extends SurfaceView implements Runnable {
         }
     };
 
+    //CheckCollisions thread, if there are no more lives: stops all other threads, update score and return to main menu
     Runnable checkCollision = new Runnable() {
         @Override
         public void run() {
             while (isRunning) {
                 for (Cone c : cones) {
                     if (Rect.intersects(c.getCollisionShape(), runningMan.getCollisionShape())) {
-                            System.out.println("I hit something");
                             if (numLives > 1) {
-                                System.out.println("initiate counter thread");
                                 Thread counter = new Thread(invincible_Counter);
                                 counter.start();
                                 try {
@@ -194,22 +180,13 @@ public class GameView extends SurfaceView implements Runnable {
                                         dbScore = Integer.parseInt(cursor.getString(1));
                                     } while (cursor.moveToNext());
                                 }
-//                                System.out.println("gamescore " + gameTime);
-//                                System.out.println("dbscore " + dbScore);
-//                                System.out.println(dbScore < gameTime);
 
                                 if(dbScore < gameTime){
                                     dbScore = gameTime;
                                     values.put(SCORE, gameTime);
                                     int rows = sqLiteDatabase.update(SCORE_TABLE, values, ID + "=?",new String[] {"1"});
-                                    System.out.println("no of rows affected" + rows);
                                 }
 
-
-                                // if yall wanna reset ur score uncomment out this
-//                                values.put(SCORE, 0);
-//                                int rows = sqLiteDatabase.update(SCORE_TABLE, values, ID + "=?",new String[] {"1"});
-//                                System.out.println("no of rows affected" + rows);
                                 cursor.close();
                                 exitGame();
                                 return;
@@ -236,6 +213,7 @@ public class GameView extends SurfaceView implements Runnable {
 
     };
 
+    // Invincibility thread, shares numLives through a mutex
     Runnable invincible_Counter = new Runnable() {
         @Override
         public void run() {
@@ -244,21 +222,18 @@ public class GameView extends SurfaceView implements Runnable {
                 synchronized (mutex){
                     numLives--;
                 }
-                    System.out.println("Number of Lives: " +numLives);
                     for(int i = 0; i < 5; i ++){
                         inv_timer ++;
                         Thread.sleep(1000);
                     }
                     inv_timer = 0;
                     isInv = false;
-                    return;
 
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
         }
     };
-
 
 
     private void toSleep() {
@@ -269,6 +244,7 @@ public class GameView extends SurfaceView implements Runnable {
         }
     }
 
+    //Draws all the graphics needed on the Canvas
     private void toDraw() throws InterruptedException {
         try {
             if (getHolder().getSurface().isValid()) {
@@ -306,7 +282,6 @@ public class GameView extends SurfaceView implements Runnable {
             e.printStackTrace();
         }
     }
-
 
 
     public void resume(){
