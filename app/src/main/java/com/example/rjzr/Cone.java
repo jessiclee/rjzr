@@ -15,8 +15,8 @@ public class Cone {
     int isOver = 0;
 
 
-    public Cone(GameView gameView, int screenX, int screenY, Resources res){
-        this.gameView = gameView;
+    public Cone(int screenX, int screenY, Resources res){
+        //this.gameView = gameView;
         this.myCone = BitmapFactory.decodeResource(res, R.drawable.cone);
 
         width = myCone.getWidth();

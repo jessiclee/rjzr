@@ -18,11 +18,10 @@
         android:id="@+id/main_highscore"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="test"
         android:layout_centerInParent="true"
-        android:textSize="40sp"
+        android:text="test"
         android:textColor="#ffffff"
-            />
+        android:textSize="40sp" />
 
     <Button
         android:id="@+id/play"

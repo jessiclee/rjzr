@@ -13,10 +13,9 @@ import android.provider.Settings;
 import android.view.MotionEvent;
 import android.view.SurfaceView;
 import android.content.Context;
+import android.view.View;
 import android.widget.TextView;
-import android.widget.Toast;
-
-import androidx.appcompat.app.AppCompatActivity;
+import android.content.Intent;
 
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -24,6 +23,7 @@ import java.util.concurrent.locks.ReentrantLock;
 public class GameView extends SurfaceView implements Runnable {
     private Thread thread;
     private boolean isRunning;
+    private boolean gameOver;
     private Paint paint;
     private Background background1, background2;
 
@@ -34,6 +34,7 @@ public class GameView extends SurfaceView implements Runnable {
     static volatile int screenX, screenY = 0;
     public static volatile float screenRatioX, screenRatioY;
     RunningMan runningMan;
+    Ghost ghost;
 
     int gameTime = 0;
     ContentValues values = new ContentValues();
@@ -50,11 +51,13 @@ public class GameView extends SurfaceView implements Runnable {
     private int numLives;
     private boolean isInv;
     private int inv_timer;
+    private MainGameView activity;
 
     private final Object mutex = new Object();
 
     public GameView(MainGameView activity, int screenX, int screenY){
         super(activity);
+        this.activity = activity;
         this.screenX = screenX;
         this.screenY = screenY;
         screenRatioX = 2560f / screenX;
@@ -63,16 +66,17 @@ public class GameView extends SurfaceView implements Runnable {
         background1 = new Background(screenX, screenY, getResources());
         background2 = new Background(screenX, screenY, getResources());
         runningMan = new RunningMan(this, screenX, screenY, getResources());
+        ghost = new Ghost(screenX, screenY, getResources());
 
         paint = new Paint();
         paint.setTextSize(128);
-        paint.setColor(Color.WHITE);
+        paint.setColor(Color.BLACK);
 
         int[] conePosY = {0, -750, -1300, -2100, -2600, -1300};
         int[] conePosX = {screenX, screenX-800, screenX+800 , screenX, screenX-800, screenX+800};
 
         for(int i = 0; i < 6; i++){
-            cones[i] = new Cone(this, conePosX[i], conePosY[i], getResources());
+            cones[i] = new Cone(conePosX[i], conePosY[i], getResources());
         }
     }
 
@@ -89,7 +93,7 @@ public class GameView extends SurfaceView implements Runnable {
         t3.start();
         t4.start();
 
-        while(isRunning){
+        while(true){
             try {
                 toDraw();
             } catch (InterruptedException e) {
@@ -184,7 +188,7 @@ public class GameView extends SurfaceView implements Runnable {
                                 }
                             } else {
                                 isRunning = false;
-
+                                gameOver = true;
                                 if (cursor.moveToFirst()) {
                                     do {
                                         dbScore = Integer.parseInt(cursor.getString(1));
@@ -195,6 +199,7 @@ public class GameView extends SurfaceView implements Runnable {
 //                                System.out.println(dbScore < gameTime);
 
                                 if(dbScore < gameTime){
+                                    dbScore = gameTime;
                                     values.put(SCORE, gameTime);
                                     int rows = sqLiteDatabase.update(SCORE_TABLE, values, ID + "=?",new String[] {"1"});
                                     System.out.println("no of rows affected" + rows);
@@ -208,10 +213,16 @@ public class GameView extends SurfaceView implements Runnable {
 
                                 cursor.close();
 
+                                try {
+                                    Thread.sleep(10000);
+                                    activity.startActivity(new Intent(activity, MainActivity.class));
+                                    activity.finish();
+                                } catch (InterruptedException e) {
+                                    e.printStackTrace();
+                                }
 
                                 return;
                             }
-
                     }
                 }
             }
@@ -255,20 +266,33 @@ public class GameView extends SurfaceView implements Runnable {
         try {
             if (getHolder().getSurface().isValid()) {
                 Canvas canvas = getHolder().lockCanvas();
-                canvas.drawBitmap(background1.background, background1.x, background1.y, paint);
-                canvas.drawBitmap(background2.background, background2.x, background2.y, paint);
-                canvas.drawBitmap(runningMan.getRun(), runningMan.x, runningMan.y, paint);
+                    canvas.drawBitmap(background1.background, background1.x, background1.y, paint);
+                    canvas.drawBitmap(background2.background, background2.x, background2.y, paint);
 
-                canvas.drawText("Lives Left:" + numLives + "", screenX/2f , 164, paint);
-                if(isInv){
-                    canvas.drawText("Invincibility:" + (5-inv_timer) + " s", screenX/4f ,950, paint);
+                if(isRunning) {
+                    canvas.drawBitmap(runningMan.getRun(), runningMan.x, runningMan.y, paint);
+                    for (Cone c : cones) {
+                        canvas.drawBitmap(c.getMyCone(), c.x, c.y, paint);
+                    }
+                    canvas.drawText("Lives Left:" + numLives + "", screenX / 2f, 164, paint);
+                    if (isInv) {
+                        canvas.drawText("Invincibility:" + (5 - inv_timer) + " s", screenX / 4f, 950, paint);
+                    }
+                    canvas.drawText("Score: " + gameTime + "", screenX / 2f, 330, paint);
+
                 }
-                canvas.drawText("Score: " + gameTime + "", screenX/2f , 330, paint);
+                if(gameOver){
+                    paint.setTextSize(150);
+                    canvas.drawText("CAUGHT BY", 300, 400, paint);
+                    canvas.drawText("CASPER THE", 300, 550, paint);
+                    canvas.drawText("FRIENDLY GHOST", 120, 700, paint);
+                    canvas.drawText("HighScore: " + dbScore + "", 280, 950, paint);
+                    canvas.drawText("Score: " + gameTime + "", 450, 1100, paint);
+                    canvas.drawBitmap(ghost.ghost, ghost.x, ghost.y, paint);
+                    paint.setTextSize(90);
+                    canvas.drawText("Exiting game....", 350, 1400, paint);
 
-                for(Cone c: cones){
-                    canvas.drawBitmap(c.getMyCone(), c.x, c.y, paint);
                 }
-
                 getHolder().unlockCanvasAndPost(canvas);
             }
         } catch(InterruptedException e){
