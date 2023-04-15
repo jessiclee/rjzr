@@ -43,7 +43,7 @@ public class MainActivity extends AppCompatActivity {
 
         TextView mainHighscore = (TextView) findViewById(R.id.main_highscore);
 
-        String actualHS = "test";
+        String actualHS = "";
         if (cursor.moveToFirst()) {
             do {
                 actualHS = cursor.getString(1);

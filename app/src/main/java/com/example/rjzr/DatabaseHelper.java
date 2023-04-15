@@ -20,19 +20,20 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final String CREATE_TABLE =
             "CREATE TABLE " + SCORE_TABLE + " (" +
-            ID + " INTEGER PRIMARY KEY, " +
-            // will auto-increment if no value passed
-            SCORE + " TEXT );";
+                    ID + " INTEGER PRIMARY KEY, " +
+                    // will auto-increment if no value passed
+                    SCORE + " TEXT );";
 
 
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
+
     @Override
     public void onCreate(SQLiteDatabase db){
         db.execSQL(CREATE_TABLE);
-        ContentValues values = new ContentValues();
 
+        ContentValues values = new ContentValues();
         values.put(SCORE, 0);
         db.insert(SCORE_TABLE, null, values);
 
@@ -45,5 +46,3 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
 }
-
-

@@ -10,7 +10,10 @@ import android.util.Log;
 import android.widget.Toast;
 
 public class MainGameView extends AppCompatActivity {
+    final String TAG = "Main GameView";
     private GameView gameView;
+
+    int swipeLane = 2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,21 +30,19 @@ public class MainGameView extends AppCompatActivity {
         Context ctx = getApplicationContext();
         setContentView(gameView);
         gameView.setOnTouchListener(new OnSwipeTouchListener(ctx) {
-            //                public void onSwipeTop() {
-//                    //Toast.makeText(ctx, "top", Toast.LENGTH_SHORT).show();
-//                }
             public void onSwipeRight() {
-                //Toast.makeText(ctx, "right", Toast.LENGTH_SHORT).show();
-                gameView.runningMan.x += 400;
+                if(swipeLane < 3){
+                    gameView.runningMan.x += 400;
+                    swipeLane++;
+                }
+
             }
             public void onSwipeLeft() {
-                //Toast.makeText(ctx, "left", Toast.LENGTH_SHORT).show();
-                gameView.runningMan.x -= 400;
+                if(swipeLane > 1) {
+                    gameView.runningMan.x -= 400;
+                    swipeLane--;
+                }
             }
-//                public void onSwipeBottom() {
-//                    //Toast.makeText(ctx, "bottom", Toast.LENGTH_SHORT).show();
-//
-//            }
 
         });
     }
