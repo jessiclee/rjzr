@@ -89,21 +89,6 @@ public class GameView extends SurfaceView implements Runnable {
         }
     }
 
-    //Thread used for score through a timer
-    Runnable timerThread = new Runnable() {
-        @Override
-        public void run() {
-
-            while(isRunning){
-                try {
-                    Thread.sleep(1000);
-                    gameTime += 1;
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
-                }
-            }
-        }
-    };
 
     // multi threading for updating the background animation and cones
     Runnable update = new Runnable() {
@@ -156,6 +141,23 @@ public class GameView extends SurfaceView implements Runnable {
             }
         }
     };
+
+    //Thread used for score through a timer
+    Runnable timerThread = new Runnable() {
+        @Override
+        public void run() {
+
+            while(isRunning){
+                try {
+                    Thread.sleep(1000);
+                    gameTime += 1;
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }
+    };
+
 
     //CheckCollisions thread, if there are no more lives: stops all other threads, update score and return to main menu
     Runnable checkCollision = new Runnable() {
