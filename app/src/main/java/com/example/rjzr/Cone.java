@@ -10,13 +10,11 @@ import android.graphics.Rect;
 
 public class Cone {
     Bitmap myCone;
-    private GameView gameView;
     int width, height = 1,x,y;
     int isOver = 0;
 
 
     public Cone(int screenX, int screenY, Resources res){
-        //this.gameView = gameView;
         this.myCone = BitmapFactory.decodeResource(res, R.drawable.cone);
 
         width = myCone.getWidth();
