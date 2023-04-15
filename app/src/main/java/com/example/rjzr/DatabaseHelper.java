@@ -15,9 +15,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String ID = "_id";
     public static final String SCORE = "score";
 
-    //String array of columns
-    private static final String[] COLUMNS = {ID, SCORE};
-
     private static final String CREATE_TABLE =
             "CREATE TABLE " + SCORE_TABLE + " (" +
                     ID + " INTEGER PRIMARY KEY, " +
