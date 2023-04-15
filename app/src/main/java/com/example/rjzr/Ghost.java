@@ -8,14 +8,12 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 
 public class Ghost {
-    //int x = 0, y = 0;
     int width, height = 1,x,y;
     Bitmap ghost;
 
     Ghost (int screenX, int screenY, Resources res) {
 
         ghost = BitmapFactory.decodeResource(res, R.drawable.ghost);
-        //background = Bitmap.createScaledBitmap(background, screenX, screenY, false);
         width = ghost.getWidth();
         height = ghost.getHeight();
 
