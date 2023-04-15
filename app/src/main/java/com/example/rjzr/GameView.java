@@ -210,23 +210,30 @@ public class GameView extends SurfaceView implements Runnable {
 //                                values.put(SCORE, 0);
 //                                int rows = sqLiteDatabase.update(SCORE_TABLE, values, ID + "=?",new String[] {"1"});
 //                                System.out.println("no of rows affected" + rows);
-
                                 cursor.close();
-
-                                try {
-                                    Thread.sleep(10000);
-                                    activity.startActivity(new Intent(activity, MainActivity.class));
-                                    activity.finish();
-                                } catch (InterruptedException e) {
-                                    e.printStackTrace();
-                                }
-
+                                exitGame();
                                 return;
                             }
                     }
                 }
             }
         }
+        public void exitGame(){
+            try {
+                Thread.sleep(10000);
+                findViewById(R.id.play).setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        activity.finish();
+                        activity.startActivity(new Intent(activity, MainGameView.class));
+                    }
+
+                });
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
     };
 
     Runnable invincible_Counter = new Runnable() {
