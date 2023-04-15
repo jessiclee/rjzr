@@ -28,8 +28,10 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         StrictMode.enableDefaults();
         View decorView = getWindow().getDecorView();
+
         // Hide the status bar.
         int uiOptions = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
                 | View.SYSTEM_UI_FLAG_FULLSCREEN
@@ -65,9 +67,6 @@ public class MainActivity extends AppCompatActivity {
         mediaPlayer.start();
 
         mediaPlayer.setLooping(true);
-
-
-
 
     }
 }
