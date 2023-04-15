@@ -221,7 +221,7 @@ public class GameView extends SurfaceView implements Runnable {
         public void exitGame(){
             try {
                 Thread.sleep(10000);
-                findViewById(R.id.play).setOnClickListener(new View.OnClickListener() {
+                setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
                         activity.finish();
